@@ -1,0 +1,7 @@
+project:
+  output-dir: docs
+
+format:
+  revealjs:
+    syntax-definitions:
+     - pg.xml
