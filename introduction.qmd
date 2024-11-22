@@ -1,0 +1,313 @@
+---
+title: Introduction to Labeled Property Graphs
+subtitle: Introduction
+author: Jakob Voß
+date: "2024"
+---
+
+# Data Modelling with Graphs (and Star Wars)
+
+## "Little boxes with arrows and stuff"
+
+![](Netwerkje.jpg)
+
+:::{.notes}
+Ken Thompson (inventor of Unix, and UTF-8) about how he begins a program with scribbling data structures
+:::
+
+## Example
+
+```{dot}
+graph {
+  rankdir=LR;
+  C3PO [fontcolor=white];
+  R2D2 [fontcolor=white];
+  Luke [fontcolor=white];
+  R2D2 -- C3PO [label="friends", fontcolor=white];
+  R2D2 -- Luke [label="⮜ owns", fontcolor=white];
+  Luke -- C3PO [label="owns ➤", fontcolor=white];
+}
+```
+
+## Example
+
+```{dot}
+graph {
+  rankdir=LR;
+  R2D2 -- C3PO [label="friends"];
+  R2D2 -- Luke [label="⮜ owns", fontcolor=black];
+  Luke -- C3PO [label="owns ➤", fontcolor=black];
+}
+```
+
+## Example
+
+```{dot}
+graph {
+  rankdir=LR;
+  C3PO [label=Robot];
+  R2D2 [label=Robot];
+  Luke [label=Person];
+  R2D2 -- C3PO [label="friends", fontcolor=white];
+  R2D2 -- Luke [label="⮜ owns", fontcolor=white];
+  Luke -- C3PO [label="owns ➤", fontcolor=white];
+}
+```
+
+## Basic graph elements for data modeling
+
+- **nodes** (aka vertices) representing entities
+- **edges** (aka connections, relations...)
+- node labels as
+  - **node identifiers** and/or
+  - **node types** (aka **node labels**, classes...)
+- edge labels as **edge types** (aka **edge labels**...)
+
+## Data modeling
+
+![](levels-of-data-modeling.svg)
+
+. . .
+
+- Arbitrary graphs used for models
+- Models expressed in data formats
+
+# Some Graph Data Formats
+
+## RDF/Turtle
+
+~~~ttl
+# directed edges
+<Luke> <owns> <R2D2> , 
+              <C3PO> .
+
+# node types (additional edges)
+<R2D2> a <robot> .
+<C3PO> a <robot> .
+<Luke> a <person> .
+
+# no undirected edges!
+<R2D2> <friend> <C3PO> .
+~~~
+
+. . .
+
+- Requires URIs
+- More limitations later
+
+## CSV
+
+robot ownership
+
+~~~csv
+owner,robot
+Luke,C3PO
+Luke,R2D2
+~~~
+
+robot friendship
+
+~~~csv
+friend1,friend2
+R2D2,C3PO
+~~~
+
+. . .
+
+- Requires contextual information
+- Least common denominator, resistance is futile!
+
+## SQL
+
+~~~sql
+# nodes
+INSERT INTO robots VALUES ("R2D2");
+INSERT INTO robots VALUES ("C3PO");
+INSERT INTO people VALUES ("Luke");
+
+# edges
+INSERT INTO robot_ownership VALUES ("Luke", "C3PO");
+INSERT INTO robot_ownership VALUES ("Luke", "R2D2");
+INSERT INTO robot_friends VALUES ("R2D2", "C3PO");   # directed!
+~~~
+
+. . .
+
+- Requires a database schema. Pros and cons?
+
+## GraphML
+
+~~~xml
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+  <graph edgedefault="undirected">
+    <node id="C3PO"/>
+    <node id="Luke"/>
+    <node id="R2D2"/>
+    <edge source="Luke" target="C3PO" directed="true"/>
+    <edge source="Luke" target="R2D2" directed="true"/>
+    <edge source="C3PO" target="R2D2"/>
+  </graph>
+</graphml>
+~~~
+
+. . .
+
+- Many more graph data formats exist
+- Mostly for applications other than metadata (e.g. network analysis)
+
+## Cypher
+
+~~~cypher
+CREATE (C3PO:robot)
+CREATE (Luke:person)
+CREATE (R2D2:robot)
+CREATE (Luke)-[:owns]->(C3PO)
+CREATE (Luke)-[:owns]->(R2D2)
+CREATE (Luke)-[:friend]->(C3PO)  # directed!
+~~~
+
+. . .
+
+- Used in property graph databases
+- Established standard (more or less)
+
+## Property Graph Exchange Format (PG)
+
+~~~pg
+# nodes
+R2D2 :robot
+C3PO :robot
+Luke :person
+
+# edges
+Luke -> C3PO :owns      # directed
+Luke -> R2D2 :owns      # undirected
+C3PO -- R2D2 :friends   # undirected
+~~~
+
+. . .
+
+- Specified, documented, implemeted, but less known
+- <https://pg-format.github.io/>
+
+## Try out PG in your browser!
+
+- <https://pg-format.github.io/pg-formatter/>
+
+- Create a graph of some robots in Star Wars!
+
+# Additional features
+
+## Additional graph features
+
+```{dot}
+digraph {
+  rankdir=LR;
+  X -> X [label="loops"];
+  subgraph cluster {
+    style=filled;
+	color=lightgrey;
+	node [style=filled,color=white];
+	a -> b;
+	label = "subgraph";
+  }
+  X -> a;
+  X -> Y [label="multi"];
+  X -> Y [label="edges"];
+  orphan;
+}
+```
+
+. . .
+
+- Support depends on the actual format or software!
+
+## Properties / Attributes
+
+~~~pg
+# node properties
+Padmé  :person  gender: female
+Anakin :person  gender: male                 
+Luke   :person  gender: male                 
+C3PO   :robot   color:  golden, silver   # multi-value!
+R2D2   :robot              
+   
+# edge properties
+Padmé  -> R2D2   :owns     episode:1
+Anakin -> R2D2   :owns     episode:2    
+Anakin -> Luke   :child    episode:3
+Padmé  -> Luke   :child    episode:3 
+Luke   -> R2D2   :owns     episode:4
+~~~
+
+## Details depend on format and software
+
+- Special properties (name, id, visual attributes, reserved words...)
+
+- Which datatypes are supported (string, number, date...)?
+
+- Can properties have values of mixed type? Empty set? Null-values?
+
+- What are node/edge ids (internal, numeric, name...)?
+
+- Can nodes/edges have multiple labels/types?
+
+## Wikidata as a property graph
+
+![](marcia-lucas-wikidata-1.png)
+![](marcia-lucas-wikidata.png)
+
+
+## Wikidata as a property graph
+
+```{mermaid}
+flowchart LR
+  Q28193["Academy Award for Best Film Editing (Q28193)<br>alias: Oscar for Best Film Editing"]
+  Q463119["Marcia Lucas (Q463119)<br><tt>alias:</tt> Marcia Griffin"]
+  Q463119 -- "<u>award received (P166)</u><br>for work: Star Wars<br>date: 1978" --> Q28193
+```
+
+. . .
+
+- node identifiers and edge labels (property identifiers)
+- data model and terminology differs from both RDF and common property graphs
+
+# First Summary
+
+## (Labeled) Property Graphs
+
+- A class of graph structures where
+
+  - nodes and edges have **labels** (aka types)
+  - nodes and edges have **properties** (aka attributes)
+
+- Specific features differ depending on data format and software
+
+- Useful for data modeling
+
+## Tow hard things
+
+> There are only two hard things in Computer Science: cache invalidation and naming things.\
+> --- Phil Karlton
+
+- Property
+  - attribute-value pair in a property graph
+  - attribute, field, ...
+  - IRI used as middle part in an RDF triple
+  - ...
+- Label
+  - type, class, ...
+  - name
+  - ...
+
+## Some property Graph data formats
+
+- CSV
+- Cypher
+- Property Graph Exchange Format (PG)
+- GraphML
+- ...
+
+Converter NPM package [pgraphs](https://www.npmjs.com/package/pgraphs)
+
