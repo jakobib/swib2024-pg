@@ -1,0 +1,211 @@
+---
+title: Introduction to Labeled Property Graphs
+subtitle: Property Graphs and RDF
+author: Jakob Voß
+date: 2024-11-22
+---
+
+# Background
+
+## RDF
+
+```{dot}
+digraph {
+  rankdir=LR;
+  subject -> object [label=predicate];
+}
+```
+
+## RDF data model
+
+```{dot}
+digraph {
+  rankdir=LR;
+  subject -> object [label=predicate];
+}
+```
+
+- subject: **IRI** or **blank node**
+- predicate: **IRI**
+- object: **IRI** or **blank node** or literal:\
+  Unicode **string** with either data type (**IRI**) or **language tag**
+
+## RDF data model: named graphs
+
+```{dot}
+digraph {
+  rankdir=LR;
+  subgraph cluster {
+    subject -> object [label=predicate];
+    label="graph";
+  }
+}
+```
+
+- graph: **IRI** or **blank node**
+- subject: **IRI** or **blank node**
+- predicate: **IRI**
+- object: **IRI** or **blank node** or literal:\
+  Unicode **string** with either data type (**IRI**) or **language tag**
+
+## RDF* data model
+
+- Subject and object can be triples as well!
+- Useful in theory, but complicated
+
+## Motivation: Semantic Web
+
+> I have a dream for the Web [in which computers] become capable of analyzing all the data on the Web – the content, links, and transactions between people and computers.\
+> -- Tim Berners Lee
+
+. . .
+
+- Information integration
+- Common Ontologies
+- Linked Open Data!
+
+## Motivation: Property Graphs
+
+- SQL ↔ NoSQL
+- Local databases
+- Enterprise systems
+- Efficient data storage and retrieval
+
+# Practice
+
+## Theory again
+
+- Several academic papers how to map\
+  RDF graphs and property graphs
+- Everything can be mapped to everything anyway
+
+## Example
+
+~~~turtle
+<Padmé>  a <person> ; <gender> "female" .
+<Anakin> a <person> ; <gender> "male" .
+<Luke>   a <person> ; <gender> "male" .
+<R2D2>   a <robot> .
+<C3PO>   a <robot> .
+
+<Padmé>  <owns> <R2D2> .
+<Anakin> <owns> <R2D2> .
+<Anakin> <child> <Luke> .
+<Padmé>  <child> <Luke> .
+<Luke>   <owns> <R2D2> .
+<Luke>   <owns> <C3PO> .
+~~~
+
+## Example graph
+
+```{mermaid}
+flowchart LR
+   male([male])
+   female([female])
+   Padmé -- a --> person
+   Anakin -- a --> person
+   Luke -- a --> person
+   R2D2 -- a --> robot
+   C3PO -- a --> robot 
+   Padmé -- owns --> R2D2
+   Anakin -- owns --> R2D2
+   Luke -- owns --> R2D2   
+   Luke -- owns --> C3PO   
+   Anakin -- child --> Luke
+   Padmé -- child --> Luke   
+   Padmé -- gender --> female
+   Luke -- gender --> male
+   Anakin -- gender --> male
+```
+
+## Example graph without rdf:type
+
+```{mermaid}
+flowchart LR
+   male([male])
+   female([female])
+   Padmé -- owns --> R2D2
+   Anakin -- owns --> R2D2
+   Luke -- owns --> R2D2   
+   Luke -- owns --> C3PO   
+   Anakin -- child --> Luke
+   Padmé -- child --> Luke   
+   Padmé -- gender --> female
+   Luke -- gender --> male
+   Anakin -- gender --> male
+```
+
+## Some limitations of RDF
+
+- No local properties but IRIs
+- Special property `rdf:type` (= `a`) instead of node labels
+- Statements can't have statements (unless RDF*)
+
+## Example graph in RDF*
+
+~~~turtle
+<Padmé>  <owns> <R2D2>   {| <episode> 1 |} .
+<Anakin> <owns> <R2D2>   {| <episode> 2 |} .   
+<Anakin> <parent> <Luke> {| <episode> 3 |} .
+<Padmé> <parent> <Luke>  {| <episode> 3 |} .
+<Luke>  <owns> <R2D2>    {| <episode> 4 |} .
+~~~
+
+SPARQL query
+
+~~~sparql
+SELECT ?p {  
+  BIND( << ?p <owns> <R2D2> >> AS ?e )
+  FILTER ( e.episode >= 2 )
+}
+~~~
+
+## SPARQL RDF* vs Cypher
+
+~~~sparql
+SELECT ?p {  
+  BIND( << ?p <owns> <R2D2> >> AS ?e )
+  FILTER ( e.episode >= 2 )
+}
+~~~
+
+~~~cypher
+MATCH (p)-[e:owns]->({name:"R2D2"})
+WHERE e.episode >= 2 RETURN p.name
+~~~
+
+# Comparison
+
+ RDF            | Property Graphen 
+----------------|------------------
+nodes and edges | nodes, edges, properties
+standard (W3C), but... | standard (ISO), but...
+global IRIs     | local references
+either schema-less... | either schema-less...
+...or shared ontologies | ...or local schema
+optional inference and rules | strict schemas and custom rules
+SPARQL | Cypher
+
+## Discussion
+
+- What do you think?
+- Questions?
+
+## When to use which?
+
+↑ Performant & Scalable
+
+- Structured Property Graphs
+- Schema-less Property Graphs
+- RDF Triple Stores
+
+↓ Flexible
+
+*But RDF also supports data integration!*
+
+## Summary
+
+- Property graphs are popular in enterprise data management
+- Try out new stuff
+- All data modeling starts with "boxes with arrows and stuff"
+

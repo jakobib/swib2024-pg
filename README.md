@@ -16,4 +16,4 @@ The tutorial is planned for half a day (3 hours plus breaks).
 
 - [Introduction](https://nichtich.quarto.pub/property-graphs-introduction)
 - [Property Graph Databases](https://nichtich.quarto.pub/property-graph-databases)
-- Property Graphs and RDF
+- [Property Graphs and RDF](https://nichtich.quarto.pub/property-graphs-and-rdf)

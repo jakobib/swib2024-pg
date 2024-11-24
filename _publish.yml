@@ -6,3 +6,7 @@
   quarto-pub:
     - id: 530ca3eb-b74f-45f3-a801-e0a346f48916
       url: https://nichtich.quarto.pub/property-graph-databases
+- source: property-graphs-and-rdf.qmd
+  quarto-pub:
+    - id: e3840dbf-0edd-405b-9d35-9395496d2737
+      url: https://nichtich.quarto.pub/property-graphs-and-rdf
