@@ -1,0 +1,14 @@
+# node properties
+Padmé  :person  gender: female
+Anakin :person  gender: male                 
+Luke   :person  gender: male                 
+C3PO   :robot   color:  golden, silver   # multi-value!
+R2D2   :robot              
+   
+# edge properties
+Padmé  -> R2D2   :owns     episode:1
+Anakin -> R2D2   :owns     episode:2    
+Anakin -> Luke   :child    episode:3
+Padmé  -> Luke   :child    episode:3 
+Luke   -> R2D2   :owns     episode:4
+Luke   -> C3PO   :owns     episode:4

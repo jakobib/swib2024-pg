@@ -2,7 +2,7 @@
 title: Introduction to Labeled Property Graphs
 subtitle: Introduction
 author: Jakob Voß
-date: "2024"
+date: 2024-11-22
 ---
 
 # Data Modelling with Graphs (and Star Wars)
@@ -92,7 +92,7 @@ graph {
 
 . . .
 
-- Requires URIs
+- Requires IRIs
 - More limitations later
 
 ## CSV
@@ -115,7 +115,7 @@ R2D2,C3PO
 . . .
 
 - Requires contextual information
-- Least common denominator, resistance is futile!
+- Least common denominator: resistance is futile!
 
 ## SQL
 
@@ -154,7 +154,8 @@ INSERT INTO robot_friends VALUES ("R2D2", "C3PO");   # directed!
 . . .
 
 - Many more graph data formats exist
-- Mostly for applications other than metadata (e.g. network analysis)
+- Mostly for applications other than metadata\
+  (e.g. network analysis)
 
 ## Cypher
 
@@ -190,6 +191,7 @@ C3PO -- R2D2 :friends   # undirected
 
 - Specified, documented, implemeted, but less known
 - <https://pg-format.github.io/>
+- Command line tool `pgraph` to convert formats
 
 ## Try out PG in your browser!
 
@@ -239,15 +241,16 @@ Anakin -> R2D2   :owns     episode:2
 Anakin -> Luke   :child    episode:3
 Padmé  -> Luke   :child    episode:3 
 Luke   -> R2D2   :owns     episode:4
+Luke   -> C3PO   :owns     episode:4
 ~~~
 
-## Details depend on format and software
+## Details depend on format & software
 
-- Special properties (name, id, visual attributes, reserved words...)
+- Special properties (name, id, visual, reserved...)
 
 - Which datatypes are supported (string, number, date...)?
 
-- Can properties have values of mixed type? Empty set? Null-values?
+- Can properties have values of mixed type? Empty set? Null?
 
 - What are node/edge ids (internal, numeric, name...)?
 
@@ -263,15 +266,18 @@ Luke   -> R2D2   :owns     episode:4
 
 ```{mermaid}
 flowchart LR
-  Q28193["Academy Award for Best Film Editing (Q28193)<br>alias: Oscar for Best Film Editing"]
-  Q463119["Marcia Lucas (Q463119)<br><tt>alias:</tt> Marcia Griffin"]
+  Q28193["<u>Academy Award for Best Film Editing (Q28193)</u><br>alias: Oscar for Best Film Editing"]
+  Q463119["<u>Marcia Lucas (Q463119)</u><br><tt>alias:</tt> Marcia Griffin"]
   Q463119 -- "<u>award received (P166)</u><br>for work: Star Wars<br>date: 1978" --> Q28193
 ```
 
 . . .
 
-- node identifiers and edge labels (property identifiers)
-- data model and terminology differs from both RDF and common property graphs
+- Node identifiers and edge labels (property identifiers)
+- Data model and terminology differ from\
+  both RDF and common property graph models
+  - aliases and descriptions with language
+  - properties can link to entities
 
 # First Summary
 
@@ -282,31 +288,30 @@ flowchart LR
   - nodes and edges have **labels** (aka types)
   - nodes and edges have **properties** (aka attributes)
 
+. . .
+
 - Specific features differ depending on data format and software
 
-- Useful for data modeling
+- Useful for data modeling and schema-less data management
 
 ## Tow hard things
 
-> There are only two hard things in Computer Science: cache invalidation and naming things.\
-> --- Phil Karlton
+> There are only two hard things in Computer Science: cache invalidation and naming things. --- Phil Karlton
 
-- Property
+- "Property"
   - attribute-value pair in a property graph
-  - attribute, field, ...
   - IRI used as middle part in an RDF triple
-  - ...
-- Label
+  - attribute, field, ...
+- "Label"
   - type, class, ...
-  - name
-  - ...
+  - name, ...
 
 ## Some property Graph data formats
 
 - CSV
 - Cypher
-- Property Graph Exchange Format (PG)
 - GraphML
+- Property Graph Exchange Format (PG)
 - ...
 
 Converter NPM package [pgraphs](https://www.npmjs.com/package/pgraphs)

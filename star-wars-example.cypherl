@@ -1,0 +1,11 @@
+CREATE (:person {gender:"male", name:"Anakin"});
+CREATE (:robot {color:["golden","silver"], name:"C3PO"});
+CREATE (:person {gender:"male", name:"Luke"});
+CREATE (:person {gender:"female", name:"Padmé"});
+CREATE (:robot {name:"R2D2"});
+MATCH (a {name:"Padmé"}), (b {name:"R2D2"}) CREATE (a)-[:owns {episode:1}]->(b);
+MATCH (a {name:"Anakin"}), (b {name:"R2D2"}) CREATE (a)-[:owns {episode:2}]->(b);
+MATCH (a {name:"Anakin"}), (b {name:"Luke"}) CREATE (a)-[:child {episode:3}]->(b);
+MATCH (a {name:"Padmé"}), (b {name:"Luke"}) CREATE (a)-[:child {episode:3}]->(b);
+MATCH (a {name:"Luke"}), (b {name:"R2D2"}) CREATE (a)-[:owns {episode:4}]->(b);
+MATCH (a {name:"Luke"}), (b {name:"C3PO"}) CREATE (a)-[:owns {episode:4}]->(b);

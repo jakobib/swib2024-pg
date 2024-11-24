@@ -1,0 +1,9 @@
+# nodes
+R2D2 :robot
+C3PO :robot
+Luke :person
+
+# edges
+Luke -> C3PO :owns      # directed
+Luke -> R2D2 :owns      # undirected
+C3PO -- R2D2 :friends   # undirected

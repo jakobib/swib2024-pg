@@ -1,0 +1,9 @@
+# nodes
+Luke   :person  gender: male                 
+C3PO   :robot   color:  golden, silver
+R2D2   :robot              
+
+# edges
+Luke -> R2D2  :owns     episode:4
+Luke -> C3PO  :owns     episode:4
+C3PO -- R2D2  :friends
