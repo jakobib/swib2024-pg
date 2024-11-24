@@ -1,0 +1,346 @@
+---
+title: Introduction to Property Graphs
+subtitle: Property Graph Databases
+author: Jakob Voß
+date: 2024-11-22
+---
+
+## Three approaches to "property graphs"
+
+- Object databases: flexible, NoSQL
+
+- Relational databases: strict schema, SQL
+
+- RDF databases: flexible, RDF model
+
+. . .
+
+Confused? That's ok!
+
+# Use the standards, Luke!
+
+## Graph Query Language (GQL)
+
+- Most recent standard (ISO/IEC 39075:2024)
+- Based on OpenCypher, based on Cypher, based on Neo4J
+- Just called Cypher anyway
+
+## Cypher Examples
+
+Create graph (no schema):
+
+~~~cypher
+# nodes
+CREATE (C3PO:robot {color:["golden","silver"]})
+CREATE (Luke:person {gender:"male"})
+CREATE (R2D2:robot)
+
+# edges (aka "relationships")
+CREATE (Luke)-[:owns {episode:4}]->(R2D2)
+CREATE (Luke)-[:owns {episode:4}]->(C3PO)
+~~~
+
+## Same graph in PG format
+
+~~~pg
+# nodes
+Luke   :person  gender: male                 
+C3PO   :robot   color:  golden, silver
+R2D2   :robot              
+
+# edges
+Luke -> R2D2  :owns     episode:4
+Luke -> C3PO  :owns     episode:4
+C3PO -- R2D2  :friend
+~~~
+
+. . .
+
+Convert PG to Cypher:
+
+~~~sh
+pgraph example.pg -t cypher
+~~~
+
+## Cypher from PG format
+
+Convert PG to Cypher with additional properties:
+
+~~~sh
+pgraph example.pg -t cypher -i name
+~~~
+
+Result:
+
+~~~cypher
+Removed 1 undirected edge.
+CREATE (C3PO:robot {name:"C3PO"})
+CREATE (Luke:person {name:"Luke"})
+CREATE (R2D2:robot {name:"R2D2"})
+CREATE (Luke)-[:owns]->(C3PO)
+CREATE (Luke)-[:owns]->(R2D2)
+~~~
+
+## CYPHERL
+
+~~~sh
+pgraph attributes-2.pg -t cypherl -i name
+~~~
+
+Node identifiers are not stable!
+
+~~~cypher
+CREATE (:person {gender:"male", name:"Anakin"});
+CREATE (:robot {color:["golden","silver"], name:"C3PO"});
+CREATE (:person {gender:"male", name:"Luke"});
+CREATE (:person {gender:"female", name:"Padmé"});
+CREATE (:robot {name:"R2D2"});
+MATCH (a {name:"Padmé"}), (b {name:"R2D2"}) CREATE (a)-[:owns {episode:1}]->(b);
+MATCH (a {name:"Anakin"}), (b {name:"R2D2"}) CREATE (a)-[:owns {episode:2}]->(b);
+MATCH (a {name:"Anakin"}), (b {name:"Luke"}) CREATE (a)-[:child {episode:3}]->(b);
+MATCH (a {name:"Padmé"}), (b {name:"Luke"}) CREATE (a)-[:child {episode:3}]->(b);
+MATCH (a {name:"Luke"}), (b {name:"R2D2"}) CREATE (a)-[:owns {episode:4}]->(b);
+MATCH (a {name:"Luke"}), (b {name:"C3PO"}) CREATE (a)-[:owns {episode:4}]->(b);
+~~~
+
+## Cypher queries
+
+~~~cypher
+# select
+MATCH (x {gender:"male"}) RETURN x.name
+MATCH (x) WHERE x.gender="male" RETURN x.name
+MATCH (x:person)-[o:owns]->(y:robot) RETURN x, y, p.episode
+
+# update
+MATCH (x) WHERE x.name="Anakin" SET x.name="Darth Vader"
+
+# delete
+MATCH ()-[r]->() DELETE r;
+MATCH (a) DELETE a
+~~~
+
+# Cypher summary
+
+## Cypher graph elements
+
+| Cypher | |
+|-|-|
+| nodes | `(a :robot)`, `(a :robot :agent)` |
+| edges | `(a) -[:friend]-> (b)`| 
+| properties | `{episode:4, color:["golden","silver"]}` | 
+
+## Same in PG format
+
+| PG | |
+|-|-|
+| nodes | `a :robot`, `a :robot :agent` |
+| edges | `a -> b :friend` |
+| properties | `episode:4 color:golden,silver` | 
+
+There's also a serialization in JSON!
+
+## Property data types
+
+- `INTEGER`
+- `FLOAT` (64 bit floating point)
+- `STRING` (Unicode string)
+- `BOOLEAN`
+- `LIST OF` any other data type
+- Proprietary extensions exist
+- No language tags (RDF) or hyper-edges (Wikibase)
+
+# Property Graph Databases
+
+## Software
+
+- [Neo4J](https://neo4j.com/) (most influental)
+- [Memgraph](https://memgraph.com/) (in-memory)
+- [Kùzu](https://kuzudb.com/) (embedded, requires schema) (full GQL)
+- [NebulaGraph](https://www.nebula-graph.io/)
+- [Apache AGE](https://age.apache.org/) (extension to PostgreSQL)
+- [FalkorDB](https://www.falkordb.com/)
+- [TuGraph](https://tugraph.tech/)
+- ...
+
+## Database API
+
+- Proprietary tools to access databases
+- No standard simple HTTP API like SPARQL
+- Neo4J created **Bolt protocol** on top of HTTP
+- Libraries for most programming languages exist
+- Supported by most Property Graph DBMS (but not all)
+
+<https://en.wikipedia.org/wiki/Bolt_(network_protocol)>
+
+## Neo4J
+
+- First and most used property graph database
+- Free but limited community version
+- Great usability, well-enough performance
+
+## Neo4J via Docker
+
+Create and run container (without attached volume):
+
+~~~sh
+docker run -e NEO4J_AUTH=none -p 7474:7474 -p 7687:7687 neo4j
+~~~
+
+Visit <http://localhost:7474>
+
+## Neo4J via Neo4j.com
+
+- Select [Get Started for Free](https://neo4j.com/product/auradb/?ref=neo4j-home-hero) at neo4j.com and "Start Free" from there to create an account (single sign on possible with an existing Google account)
+
+- Create a free database instance
+
+- **Copy & save the password!**
+
+- Wait a few minutes
+
+- Select "Query"
+
+# Exercise
+
+## Exercice
+
+- Start your instance of Neo4J (or get share credentials)
+- Injest [Star Wars example](https://github.com/jakobib/swib2024-pg/blob/main/star-wars-example.cypherl)\
+  (`star-wars-example.cypherl`)
+- Try to craft some sample queries and play around
+- Show it to us!
+
+## Hint
+
+![](node-name-neo4j.png)
+
+## Sample queries
+
+- List names of robots / people
+- Who is the father of Luke?
+- Make every robot and person an `agent` as well
+- Which robot was owned by a person and by its child?
+- Remove property `male`
+- ...
+
+# Advances Topics
+
+## How to Import data
+
+- CYPHER/CYPHERL statements
+- `LOAD CSV` (no standard but pretty common)
+- Specific tools shipped with each database system
+- Programming API or tools such as `pgraph`
+
+## Viewers
+
+- Specific tools shipped with each PGDBMS
+- Many tools and libraries exist 
+- Highly depend on use case
+
+*Sorry, not investigated yet!*
+
+## Constraints and indexes
+
+- Not part of OpenCypher / Graph Query Language (GQL)
+- Support and syntax differs across database systems
+
+## Constraints and indexes
+
+- Property uniqueness constraint
+  - Neo4J: `CREATE CONSTRAINT FOR (r:robot) REQUIRE r.name IS UNIQUE;`
+  - Memgraph: `CREATE CONSTRAINT ON (r:robot) ASSERT r.name IS UNIQUE;`
+- Property existence constraint
+  - Neo4J (Enterprise): `CREATE CONSTRAINT FOR (r:robot) REQUIRE r.name IS NOT NULL;`
+  - Memgraph: `CREATE CONSTRAINT ON (r:robot) ASSERT exists (r.name);`
+
+## Constraints and indexes
+
+- Single property index
+  - Neo4J: `CREATE INDEX robot_name FOR (r:robot) ON r.name`
+  - Memgraph: `CREATE INDEX ON :robot(name);`    
+- Relationship Multiplicities\
+  (1-to-1, 1-to-many, many-to-many, many-to-1)
+  - Not supported in Neo4J or Memgraph but in Kùzu
+
+## Database schemas
+
+- Not part of OpenCypher
+- Part of Graph Query Language (GQL)
+  - Graphs can be schema-free or fixed-schema
+- Support and syntax differs across database systems
+
+## SQL Schema
+
+~~~sql
+# node types (database schema)
+CREATE TABLE robots (name VARCHAR PRIMARY KEY NOT NULL);
+CREATE TABLE people (name VARCHAR PRIMARY KEY NOT NULL);
+
+# edge types (database schema)
+CREATE TABLE robot_ownership (
+  owner VARCHAR REFERENCES people (name),
+  robot VARCHAR REFERENCES robots (name)
+)
+~~~
+
+## Property Graph Schema
+
+Neo4J: No (explicit) schema, only constraints
+
+~~~
+CALL db.schema.visualization()
+~~~
+
+Kùzu:
+
+~~~cypher
+CREATE NODE TABLE robots (name STRING, PRIMARY KEY (name));
+CREATE NODE TABLE people (name STRING, PRIMARY KEY (name));
+CREATE REL TABLE robot_ownership (FROM pople TO robots);
+~~~
+
+## Property Graph Schema: GQL
+
+Something like this (I could not verify)
+
+~~~cypher
+CREATE GRAPH TYPE StarWars AS {
+  (:person { name::STRING NOT NULL, gender::STRING }),
+  (:robot  { name::STRING NOT NULL, color:: LIST OF STRING }),
+  (:person)-[:owns]->(:robot)
+}
+~~~
+
+Other syntax variants exist.
+
+## Do we need schemas?
+
+↑ Performant & Scalable
+
+- Structured Property Graphs (more like SQL)
+- Schema-less Property Graphs (NoSQL)
+- RDF Triple Stores (NoSQL)
+
+↓ Flexible
+
+# Summary
+
+## Advice
+
+:::{.incremental}
+
+- Start with Neo4J
+- Try out other graph database management systems
+- Start without a schema
+- Add indexes, constraints, and schemas if needed
+- Just wait until GQL has fully been adopted?
+- You might end up back at Entity-Relationship Modeling
+
+:::
+
+## References
+
+- Voß, Jakob. 2024. *Property-Graphen: eine kurze Einführung.* VZG Aktuell. https://doi.org/10.5281/zenodo.10971391
+- Markus Krötzsch: *Introduction to Property Graphs.* (lecture)
+

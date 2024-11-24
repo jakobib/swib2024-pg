@@ -1,0 +1,8 @@
+- source: introduction.qmd
+  quarto-pub:
+    - id: 8408ef28-cb3b-4396-a99b-8c0e348b1707
+      url: https://nichtich.quarto.pub/property-graphs-introduction
+- source: databases.qmd
+  quarto-pub:
+    - id: 530ca3eb-b74f-45f3-a801-e0a346f48916
+      url: https://nichtich.quarto.pub/property-graph-databases

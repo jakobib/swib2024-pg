@@ -11,3 +11,9 @@ property graph exchange format PG. Data modeling with property graphs is shown a
 each of its advantages and limitations.
 
 The tutorial is planned for half a day (3 hours plus breaks).
+
+## Slides
+
+- [Introduction](https://nichtich.quarto.pub/property-graphs-introduction)
+- [Property Graph Databases](https://nichtich.quarto.pub/property-graph-databases)
+- Property Graphs and RDF
