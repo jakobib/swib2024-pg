@@ -17,3 +17,15 @@ The tutorial is planned for half a day (3 hours plus breaks).
 - [Introduction](https://nichtich.quarto.pub/property-graphs-introduction)
 - [Property Graph Databases](https://nichtich.quarto.pub/property-graph-databases)
 - [Property Graphs and RDF](https://nichtich.quarto.pub/property-graphs-and-rdf)
+
+## Additional links
+
+- [The workshop in SWIB Discourse](https://forum.swib.org/t/workshop-introduction-to-property-graphs/136)
+- NFDI4Objects [Cypher API](https://nfdi4objects.github.io/n4o-graph/cypher.html)
+  (experimental, see also [Manual](https://nfdi4objects.github.io/n4o-graph/cypher.html))
+- [Git repository](https://github.com/jakobib/swib2024-pg#readme)
+
+## License
+
+All content of this repository can be used freely (CC-Zero) but attribution would be kind.
+-
